@@ -4,9 +4,13 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
+    const { userId } = auth();
     const body = await req.json();
-
     const { label, imageUrl } = body;
+
+    if (!userId) {
+      return new NextResponse("Unauthenticated", { status: 401 });
+    }
 
     if (!label) {
       return new NextResponse("Label is required", { status: 400 });
@@ -18,6 +22,19 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
+    }
+
+    // confirm the sotreId is actually exist for this user bcs they can create billboards for other ppls store
+    const storeByUserId = await prismadb.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId: userId,
+      },
+    });
+
+    // if the user want to update someone else's store
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 403 });
     }
 
     const billboard = await prismadb.billboard.create({

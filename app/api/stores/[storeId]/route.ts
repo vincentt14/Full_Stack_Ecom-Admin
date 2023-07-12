@@ -39,7 +39,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
   }
 }
 
-// dont delete request even when its not used, bcs the params only available on the 2nd params on Delete func
+// dont delete request param even when its not used, bcs the params only available on the 2nd params on Delete func
 export async function DELETE(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = auth();

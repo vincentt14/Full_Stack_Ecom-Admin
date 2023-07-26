@@ -1,7 +1,7 @@
 import prismadb from "@/lib/prismadb";
 import { CategoryForm } from "./components/category-form";
 
-const CategoryPage = async ({ params }: { params: { storeId: string; categoryId: string } }) => {
+const CategoryPage = async ({ params }: { params: { storeId: string, categoryId: string } }) => {
   // fetch the existing category using the ID in URL
   const category = await prismadb.category.findUnique({
     where: {
@@ -11,14 +11,17 @@ const CategoryPage = async ({ params }: { params: { storeId: string; categoryId:
 
   const billboards = await prismadb.billboard.findMany({
     where: {
-      id: params.storeId,
+      storeId: params.storeId,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <CategoryForm  initialData={category} />
+        <CategoryForm  initialData={category} billboards={billboards} />
       </div>
     </div>
   );
